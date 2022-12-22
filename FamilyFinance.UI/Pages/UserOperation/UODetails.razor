@@ -1,0 +1,146 @@
+﻿@page "/UserOperation"
+@page "/UserOperation/{Id:int}"
+@inject IUserOperationsService<UserOperationModel> UserOperationService
+@inject IBudgetItemService<BudgetItemModel> BudgetItemService
+@inject IFinancialOperationService<FinancialOperationModel> FinancialOperationService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+@if (Id == null)
+{
+    <PageTitle>Create a new operation</PageTitle>
+    <h3 class="text-center mt-4 mb-4">Create a new operation</h3>
+}
+
+else
+{
+    <h3 class="mb-5">Edit  </h3>
+
+}
+
+<EditForm Model="uo" class="col-md-8 offset-2">
+    <DataAnnotationsValidator />
+    <div>
+        <label for="uoBI">Date of operation</label>
+        <div>
+            <InputDate id="date" @bind-Value="uo.Date" class="form-select"> </InputDate>
+            <ValidationMessage For="@(()=>uo.Date)" />
+        </div>
+    </div>
+
+    <div>
+        <label for="uoBI">Budget Item</label>        
+        <InputSelect @bind-Value="uo.BudgetItemId" class="form-select">
+            <option value="0">--Select Budget Item --</option>
+            @foreach (var uoBI in BudgetItemService.ListOfEntities)
+            {
+                <option value="@uoBI.Id">@uoBI.Item</option>
+            }
+        </InputSelect>      
+    </div>
+
+    <div>
+
+        <label for="uoBI">Sum of operation</label>
+        <div>
+            <InputNumber id="sumBI" @bind-Value="uo.SumBudgetItem" class="form-select"> </InputNumber>
+            <ValidationMessage For="@(()=>uo.SumBudgetItem)" />
+        </div>
+    </div>
+
+    <div>
+        <label for="uoFO">Financial Operation</label>
+       
+        <InputSelect @bind-Value="uo.FinOperationId" class="form-select">
+            <option value="0">--Select Financial Operation --</option>
+            @foreach (var uoFO in FinancialOperationService.ListOfEntities)
+            {
+                <option value="@uoFO.Id">@uoFO.FinOperation</option>
+            }
+        </InputSelect>      
+    </div>
+
+    <div>
+        <label for="uoFO">Sum of financial operation</label>
+        <div>
+            <InputNumber id="sumFO" @bind-Value="uo.SumFinOperation" class="form-select"> </InputNumber>
+            <ValidationMessage For="@(()=>uo.SumFinOperation)" />
+        </div>
+    </div>
+
+    <br />
+
+    <button typeof="button" class="btn btn-primary" @onclick="HandleSubmit">@btnText</button>
+    <button typeof="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+</EditForm>
+
+    
+
+   
+<Confirmation @ref="confirmation" OnCancel="OnCancel" OnConfirm="OnConfirm">
+    <div class="text-danger">Do you wish to delete this operation ?</div>
+</Confirmation>
+
+
+@code {
+    [Parameter] public int? Id { get; set; }
+
+    Confirmation confirmation;
+
+    UserOperationModel uo = new();
+    string btnText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New opration" : "Update operation";
+        await BudgetItemService.GetListOfEntities();
+        await FinancialOperationService.GetListOfEntities();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+
+        }
+        else
+        {
+            uo = await UserOperationService.GetEntity((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await UserOperationService.AddEntity(uo);
+            NavigationManager.NavigateTo($"/uo");
+        }
+        else
+        {
+            uo.BudgetItemId ??= 0;
+            uo.FinOperationId ??= 0;
+            await UserOperationService.UpdateEntity(uo);
+            NavigationManager.NavigateTo($"/uo");
+        }
+    }
+
+    void Delete()
+    {
+        confirmation.Show();
+        
+    }
+   async Task OnConfirm()
+    {   
+        uo.BudgetItemId ??= 0;
+        uo.FinOperationId ??= 0;
+        await UserOperationService.DeleteEntity(uo);
+        NavigationManager.NavigateTo($"/uo");
+        confirmation.Hide();
+    }
+
+    void OnCancel()
+    {
+      confirmation.Hide();
+    }
+}

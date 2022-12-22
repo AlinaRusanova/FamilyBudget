@@ -1,0 +1,88 @@
+﻿@page "/FinancialOperation"
+@page "/FinancialOperation/{Id:int}"
+@inject IFinancialOperationService<FinancialOperationModel> FinancialOperationService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+@if (Id == null)
+{
+    <PageTitle>Create a new Financial Operation</PageTitle>
+    <h3 class="text-center mt-4 mb-4">Create a new Financial Operation</h3>
+}
+
+else
+{
+    <h3 class="mb-5">Edit Budget Item @fo.FinOperation </h3>
+
+}
+
+<EditForm Model="fo" class="col-md-8 offset-2">
+ 
+    <div>
+        <label for="finOp">Financial Operation</label>
+        <InputText id="finOp" @bind-Value="fo.FinOperation" class="form-control"></InputText>
+    </div>
+    <br />
+    <button typeof="submit" class="btn btn-primary" @onclick="HandleSubmit">@btnText</button>
+    <button typeof="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+
+</EditForm>
+
+<Confirmation @ref="confirmation" OnCancel="OnCancel" OnConfirm="OnConfirm">
+    <div class="text-danger">Do you wish to delete @fo.FinOperation ?</div>
+</Confirmation>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    FinancialOperationModel fo = new();
+    Confirmation confirmation;
+    string btnText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Financial Operation" : "Update Financial Operation";
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+
+        }
+        else
+        {
+            fo = await FinancialOperationService.GetEntity((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await FinancialOperationService.AddEntity(fo);
+            NavigationManager.NavigateTo($"/fo");
+        }
+        else
+        {
+            await FinancialOperationService.UpdateEntity(fo);
+            NavigationManager.NavigateTo($"/fo");
+        }
+    }
+
+    void Delete()
+    {
+        confirmation.Show();
+
+    }
+    async Task OnConfirm()
+    {
+        await FinancialOperationService.DeleteEntity(fo);
+        NavigationManager.NavigateTo($"/fo");
+        confirmation.Hide();
+    }
+
+    void OnCancel()
+    {
+        confirmation.Hide();
+    }
+}

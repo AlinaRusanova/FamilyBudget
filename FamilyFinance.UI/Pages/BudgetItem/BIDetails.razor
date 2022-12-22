@@ -1,0 +1,102 @@
+﻿@page "/BudgetItem"
+@page "/BudgetItem/{Id:int}"
+@inject IBudgetItemService<BudgetItemModel> BudgetItemService
+@inject NavigationManager NavigationManager
+@attribute [Authorize]
+
+
+
+@if (Id == null)
+{
+    <PageTitle>Create a new Budget Item</PageTitle>
+    <h3 class="text-center mt-4 mb-4">Create a new Budget Item</h3>
+}
+
+else
+{
+    <h3 class="mb-5">Edit Budget Item @bi.Item </h3>
+
+}
+
+<EditForm Model="bi" class="col-md-8 offset-2">
+    <div>
+        <label for="biType">Type</label>
+        <InputSelect @bind-Value="bi.BudgetType" class="form-select">
+           
+            @foreach (var type in BudgetItemService.ListOfEntities.Select(x => x.BudgetType).Distinct())
+            {
+                <option value="@type">@type</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        <label for="biItem">Item</label>
+        <InputText id="biItem" @bind-Value="bi.Item" class="form-control"></InputText>
+    </div>
+    <br />
+    <button typeof="submit" class="btn btn-primary" @onclick="HandleSubmit">@btnText</button>
+    <button typeof="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+
+</EditForm>
+
+<Confirmation @ref="confirmation" OnCancel="OnCancel" OnConfirm="OnConfirm">
+    <div class="text-danger">Do you wish to delete @bi.Item ?</div>
+</Confirmation>
+
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    BudgetItemModel bi = new();
+    Confirmation confirmation;
+    string btnText = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        btnText = Id == null ? "Save New Budget Item" : "Update Budget Item";
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id == null)
+        {
+
+        }
+        else
+        {
+            bi = await BudgetItemService.GetEntity((int)Id);
+        }
+    }
+
+    async Task HandleSubmit()
+    {
+        if (Id == null)
+        {
+            await BudgetItemService.AddEntity(bi);
+            NavigationManager.NavigateTo($"/bi");
+        }
+        else
+        {
+            await BudgetItemService.UpdateEntity(bi);
+            NavigationManager.NavigateTo($"/bi");
+        }
+    }
+
+    void Delete()
+    {
+        confirmation.Show();
+
+    }
+    async Task OnConfirm()
+    {       
+        await BudgetItemService.DeleteEntity(bi);
+        NavigationManager.NavigateTo($"/bi");
+        confirmation.Hide();
+    }
+
+    void OnCancel()
+    {
+        confirmation.Hide();
+    }
+}

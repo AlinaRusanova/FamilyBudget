@@ -1,0 +1,75 @@
+﻿@page "/bi"
+@inject IBudgetItemService<BudgetItemModel> BudgetItemService
+@inject NavigationManager NavigationManager
+
+
+
+@if (BudgetItemService.ListOfEntities.Count == 0)
+{
+  <DisplaySpinner />  
+}
+else
+{
+
+    <h3 class="mb-5">Budget Items</h3>
+ <AuthorizeView>
+    <Authorized>
+            <button class="btn btn-success mb-2" @onclick="(()=>Create())">Add New Budget Item</button>
+    </Authorized>
+</AuthorizeView>
+    
+
+    <div class="table-responsive mt-2">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Type</th>
+                    <th>Item</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var bi in BudgetItemService.ListOfEntities)
+                {
+                    <tr>
+                        <td>@bi.Id</td>
+                        <td>@bi.BudgetType</td>
+                        <td>@bi.Item</td>
+                        <AuthorizeView>
+                            <Authorized>
+                                <td><buttom class="btn btn-primary" @onclick="(() => ShowBI((int)bi.Id))"><i class="oi oi-pencil"></i></buttom></td>
+                            </Authorized>
+                        </AuthorizeView>
+                       
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+    
+}
+
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await BudgetItemService.GetListOfEntities();
+        NavigationManager.NavigateTo($"/bi");
+    }
+
+    void ShowBI(int id)
+    {
+        NavigationManager.NavigateTo($"/BudgetItem/{id}");
+    }
+
+    void Create()
+    { 
+        NavigationManager.NavigateTo($"/BudgetItem");
+    }
+}

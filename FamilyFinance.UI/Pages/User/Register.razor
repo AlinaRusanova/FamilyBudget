@@ -1,0 +1,67 @@
+﻿@page "/Register"
+@inject IUserService<UserModel> UserService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Register</PageTitle>
+<h3 class="text-center mt-4 mb-4">Register</h3>
+
+<EditForm Model="user" class="col-md-8 offset-2">
+    <DataAnnotationsValidator />
+    <div>
+        <label for="uoBI">First Name</label>
+        <div>
+            <InputText id="firstName" @bind-Value="user.FirstName" class="form-select"> </InputText>
+            <ValidationMessage For="@(()=>user.FirstName)" />
+        </div>
+    </div>
+
+    <div>
+        <label for="uoBI">Last Name</label>
+        <div>
+            <InputText id="lastName" @bind-Value="user.LastName" class="form-select"> </InputText>
+            <ValidationMessage For="@(()=>user.LastName)" />
+        </div>
+    </div>
+
+    <div>
+        <label for="uoBI">Username</label>
+        <div>
+            <InputText id="username" @bind-Value="user.UserName" class="form-select"> </InputText>
+            <ValidationMessage For="@(()=>user.UserName)" />
+        </div>
+    </div>
+
+    <div>
+        <label for="uoBI">Password</label>
+        <div>
+            <InputText id="password" @bind-Value="user.Password" class="form-select" type="password"> </InputText>
+            <ValidationMessage For="@(()=>user.Password)" />
+        </div>
+    </div>
+
+    <br />
+
+    <button typeof="button" class="btn btn-primary" @onclick="HandleSubmit">Register</button>
+</EditForm>
+
+<p class="mt-5 text-center text-danger">@ErrorMessage</p>
+
+@code {
+    UserModel user = new();
+    public string ErrorMessage { get; set; }
+
+
+    async Task HandleSubmit()
+    {
+        try
+        {
+            await UserService.Register(user);
+            NavigationManager.NavigateTo($"/");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        
+    }   
+}

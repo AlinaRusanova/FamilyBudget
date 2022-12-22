@@ -1,0 +1,66 @@
+﻿<div class="table-responsive">
+    <table class="table table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>№</th>
+                <th>Date</th>
+                <th>Budget Item</th>
+                <th>Sum of operation</th>
+                <th>Financial operation</th>
+                <th>Sum of financial operation</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var uo in UOs)
+            {
+                <tr>
+                    <td>@id</td>
+                    <td>@uo.Date.ToShortDateString()</td>
+                    <td>
+                        @if (@uo.BudgetItem != null)
+                        {
+                            @uo.BudgetItem.Item
+                        }
+                        else
+                            @string.Empty
+
+
+
+                        </td>
+                        <td>@uo.SumBudgetItem</td>
+                        <td>
+                        @if (@uo.FinOperation != null)
+                        {
+                            @uo.FinOperation.FinOperation
+                        }
+                        else
+                            @string.Empty
+
+                        </td>
+
+                        <td>@uo.SumFinOperation</td>
+
+                        <AuthorizeView>
+                            <Authorized>
+                                <td><buttom class="btn btn-primary" @onclick="ShowUO"><i class="oi oi-pencil"></i></buttom></td>
+                                @*<td><buttom class="btn btn-primary" @onclick="(() => ShowBI((int)uo.Id))"><i class="oi oi-pencil"></i></buttom></td>*@
+                            </Authorized>
+                        </AuthorizeView>
+
+                    </tr>
+                id++;
+            }
+
+        </tbody>
+    </table>
+
+</div>
+
+@code {
+
+    [Parameter] public List<UserOperationModel> UOs { get; set; }
+    [Parameter] public EventCallback ShowUO { get; set; }
+    int id = 1;
+}

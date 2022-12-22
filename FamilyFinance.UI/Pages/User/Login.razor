@@ -1,0 +1,46 @@
+﻿@page "/"
+
+@*@inject HttpClient Http*@
+@inject IUserService<UserModel> UserService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login</PageTitle>
+<h3>Login</h3>
+
+<EditForm Model="user" OnSubmit="HandleLogin">
+    <label for="username">Username</label>
+    <InputText id="username" @bind-Value="user.UserName" />
+    <label for="password">Password</label>
+    <InputText id="password" @bind-Value="user.Password" type="password" />
+    <button type="submit" class="btn btn-primary">Do it!</button>
+</EditForm>
+
+<p class="mt-5 text-center text-danger">@ErrorMessage</p>
+
+@code{
+
+    UserModel user = new();
+    public string ErrorMessage { get; set; }
+
+
+    async Task HandleLogin()
+    {        
+        try
+        {
+           var userAuthed = await UserService.Login(user);
+
+            var token = userAuthed.Token;
+
+            await LocalStorage.SetItemAsync("token", token);
+            await AuthStateProvider.GetAuthenticationStateAsync();
+
+            NavigationManager.NavigateTo($"/uo");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+}

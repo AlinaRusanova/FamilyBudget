@@ -1,0 +1,73 @@
+﻿@page "/fo"
+@inject IFinancialOperationService<FinancialOperationModel> FinancialOperationService
+@inject NavigationManager NavigationManager
+
+
+
+@if (FinancialOperationService.ListOfEntities.Count == 0)
+{
+    <DisplaySpinner />
+}
+else
+{
+
+    <h3 class="mb-5">Financial Operations</h3>
+ <AuthorizeView>
+    <Authorized>
+            <button class="btn btn-success mb-2" @onclick="(()=>Create())">Add New Financial Operation</button>
+    </Authorized>
+</AuthorizeView>
+    
+
+    <div class="table-responsive mt-2">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Financial Operation</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var fo in FinancialOperationService.ListOfEntities)
+                {
+                    <tr>
+                        <td>@fo.Id</td>
+                        <td>@fo.FinOperation</td>
+                        <AuthorizeView>
+                            <Authorized>
+                                <td><buttom class="btn btn-primary" @onclick="(() => ShowFO((int)fo.Id))"><i class="oi oi-pencil"></i></buttom></td>
+                            </Authorized>
+                        </AuthorizeView>
+                       
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+    </div>
+    
+}
+
+
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FinancialOperationService.GetListOfEntities(); 
+        NavigationManager.NavigateTo($"/fo");
+    }
+
+    void ShowFO(int id)
+    {
+        NavigationManager.NavigateTo($"/FinancialOperation/{id}");
+    }
+
+    void Create()
+    { 
+        NavigationManager.NavigateTo($"/FinancialOperation");
+    }
+}

@@ -1,0 +1,174 @@
+﻿@page "/report"
+@inject IUserOperationsService<UserOperationModel> UserOperationService
+@inject IReportService<ReportModel> ReportService
+@attribute [Authorize]
+
+<PageTitle>Report</PageTitle>
+<h3 class="text-center mt-4 mb-4">Report</h3>
+<div>
+<span>
+    <input type="checkbox" @bind="displayButtonsDaily" />
+    Report for certain day
+</span>
+</div>
+
+<div>
+<span><input type="checkbox" @bind="displayButtonsPeriod" />
+    Report for period
+</span>
+</div>
+
+<br/>
+<EditForm Model="report">
+
+    @if (displayButtonsDaily)
+    {
+        displayButtonsPeriod = false;
+        report = new();
+        <div class="row mt-4">
+            <div class="col-6">
+            <InputSelect @bind-Value="date" class="form-select">
+                <option value="">--Select Date --</option>
+                @foreach (var date in UserOperationService.ListOfEntities.Select(x => x.Date).Distinct())
+                {
+                    <option value="@date">@date.ToShortDateString()</option>
+                }
+            </InputSelect>
+            </div>
+            <div class="col-6">
+            <button typeof="button" class="btn btn-primary" @onclick="GetDailyReport">Submit</button>
+            </div>
+        </div>
+    }
+    @if (displayButtonsPeriod)
+    {
+        displayButtonsDaily = false;
+        report = new();
+        <div class="row mt-4">
+            <div class="col-4">
+                <label for="dateFrom">DateFrom</label>
+                <InputDate id="dateFrom" @bind-Value="report.DateFrom" class="form-select"> </InputDate>
+            </Div>
+
+            <div class="col-4">
+                <label for="dateTo">DateTo</label>
+                <InputDate id="dateTo" @bind-Value="report.DateTo" class="form-select"> </InputDate>
+            </Div>
+
+            <div class="col-4">
+                <button typeof="button" class="btn btn-primary mt-4" @onclick="GetPeriodReport">Submit</button>
+            </div>
+        </div>
+    }
+
+       
+</EditForm>
+
+@if (report.UserOperations != null)
+{
+    @if (report.Profit<0)
+    {
+        colorText = "text-danger";
+    }
+
+    <div class="row">
+    <div class="col-3"></div>
+    <div class="col-6 mt-5 text-center modal-dialog-centered justify-content-center  ">
+        <div class="border border-primary rounded p-4">
+            <p>Incomes = @string.Format("{0:N0}",report.Incomes) ₴</p>
+            <p>Expenses = - @string.Format("{0:N0}", report.Expenses) ₴</p>
+            <b class=@colorText>Result = @string.Format("{0:N0}",report.Profit) ₴</b>
+        </div>
+    </div>
+
+    <div class="table-responsive mt-3">
+        <table class="table table-striped">
+            <thead class="thead-light">
+                <tr>
+                    <th>№</th>
+                    <th>Date</th>
+                    <th>Budget Item</th>
+                    <th>Sum of operation</th>
+                    <th>Financial operation</th>
+                    <th>Sum of financial operation</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var uo in report.UserOperations)
+                {
+                    <tr>
+                        <td>@id</td>
+                        <td>@uo.Date.ToShortDateString()</td>
+                        <td>
+                            @if (@uo.BudgetItem != null)
+                            {
+                                @uo.BudgetItem.Item
+                            }
+                            else
+                                @string.Empty
+
+                        </td>
+
+                        <td>
+                            @if (@uo.BudgetItem != null)
+                            {
+                                 <span>@string.Format("{0:N0}",uo.SumBudgetItem) ₴ </span>
+                            }
+                            else
+                                @string.Empty                          
+                        </td>
+
+
+
+                        <td>
+                            @if (@uo.FinOperation != null)
+                            {
+                                @uo.FinOperation.FinOperation
+                            }
+                            else
+                                @string.Empty            
+                            </td>
+
+                        <td>
+                            @if (@uo.FinOperation != null)
+                            {
+                                 <span>@string.Format("{0:N0}",uo.SumFinOperation) ₴ </span>
+                            }
+                            else
+                                @string.Empty 
+                        </td>                      
+                    </tr>
+                    id++;
+                }
+
+            </tbody>
+        </table>
+    </div>
+    </div>
+}
+
+
+
+@code {
+    bool displayButtonsDaily = false;
+    bool displayButtonsPeriod = false;
+    int id = 1;
+    string colorText = "text-success";
+
+    ReportModel report = new();
+    string date = string.Empty;
+    
+
+    async Task GetDailyReport()
+    {
+        report = await ReportService.GetDailyReportAsync(date);
+      
+    }
+
+    async Task GetPeriodReport()
+    {
+        report = await ReportService.GetPeriodReportAsync(report.DateFrom.ToString(), report.DateTo.ToString());
+    }
+}
