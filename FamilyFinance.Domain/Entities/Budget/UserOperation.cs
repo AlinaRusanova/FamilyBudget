@@ -5,6 +5,7 @@ namespace FamilyFinance.Domain.Entities.Budget
 {
     public class UserOperation : Entity
     {
+        //[DateTime ]
         public DateTime Date { get; set; } = DateTime.Today.Date;
         public BudgetItem? BudgetItem { get; set; }
         public int SumBudgetItem { get; set; } = 0;

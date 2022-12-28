@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/8e70f7d5-9c34-43b1-a17b-1105dcb79d30/AppServices/subscriptions/8e70f7d5-9c34-43b1-a17b-1105dcb79d30/resourceGroups/FoxmindedEurop/providers/Microsoft.Web/sites/familybudget-be",
+    "appService.deploySubpath": "publish"
+}

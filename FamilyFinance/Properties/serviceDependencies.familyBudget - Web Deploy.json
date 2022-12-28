@@ -1,19 +1,23 @@
 {
   "dependencies": {
-    "apis2": {
-      "apiEndpoint": "https://familyfinancewebapi.azure-api.net/",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/FamilyFinanceWebApi/apis/FamilyFinanceWebApi",
-      "type": "apis.azure"
-    },
     "identityapp1": {
-      "type": "identityapp.default",
+      "ignored": "true",
+      "type": "identityapp",
       "dynamicId": null
+    },
+    "apis1": {
+      "ignored": "true",
+      "type": "apis"
+    },
+    "apis2": {
+      "ignored": "true",
+      "type": "apis.azure"
     },
     "mssql1": {
       "secretStore": "AzureAppSettings",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/familyfinance/databases/FamilyFinanceDB",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/familybudgetserver/databases/FamilyBudgetDB",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:FFDbConnectionStrings"
+      "connectionId": "FFDbConnectionStrings"
     }
   }
 }
