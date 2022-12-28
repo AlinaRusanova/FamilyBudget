@@ -24,7 +24,6 @@
     @if (displayButtonsDaily)
     {
         displayButtonsPeriod = false;
-    //    report = new();
         <div class="row mt-4">
             <div class="col-6">
             <InputSelect @bind-Value="date" class="form-select">
@@ -43,11 +42,12 @@
     @if (displayButtonsPeriod)
     {
         displayButtonsDaily = false;
-      //  report = new();
         <div class="row mt-4">
             <div class="col-4">
                 <label for="dateFrom">DateFrom</label>
-                <InputDate id="dateFrom" @bind-Value="report.DateFrom" class="form-select"> </InputDate>
+                <div>
+                  <InputDate id="dateFrom" @bind-Value="report.DateFrom" class="form-select"> </InputDate>
+                </div>
             </Div>
 
             <div class="col-4">
@@ -68,7 +68,13 @@
 {
     @if (report.Profit<0)
     {
+        id = 1;
         colorText = "text-danger";
+    }
+        @if (report.Profit>0)
+    {
+        id = 1;
+        colorText = "text-success";
     }
 
     <div class="row">
@@ -97,8 +103,8 @@
 
             <tbody>
                 @foreach (var uo in report.UserOperations)
-                {
-                    <tr>
+                    {
+                        <tr>
                         <td>@id</td>
                         <td>@uo.Date.ToShortDateString()</td>
                         <td>
@@ -159,7 +165,11 @@
 
     ReportModel report = new();
     string date = string.Empty;
-    
+
+    protected override async Task OnInitializedAsync()
+    {
+       await UserOperationService.GetListOfEntities();
+    }
 
     async Task GetDailyReport()
     {

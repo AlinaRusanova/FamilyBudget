@@ -5,20 +5,25 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>6d07354a-1075-41ee-a80f-9dcdf0668053</UserSecretsId>
+	  <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.12" />
     <PackageReference Include="Radzen.Blazor" Version="4.4.1" />
     <PackageReference Include="Syncfusion.Blazor.Spinner" Version="20.3.0.59" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FamilyFinance\FamilyFinance.WebApi.csproj" />
+    <ProjectReference Include="..\FamilyFinance.Persistence\FamilyFinance.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\img\loading.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

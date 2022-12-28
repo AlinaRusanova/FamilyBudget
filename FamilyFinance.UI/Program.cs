@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 using FamilyFinance.Persistence.Models.Budget;
 using FamilyFinance.Persistence.Models.Identity;
 using FamilyFinanceUI;
+using Microsoft.Extensions.Logging.AzureAppServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,16 @@ builder.Services.AddScoped<IUserOperationsService<UserOperationModel>, UserOpera
 builder.Services.AddScoped<IReportService<ReportModel>, ReportService>();
 builder.Services.AddScoped<IUserService<UserModel>, UserService>();
 builder.Services.AddScoped<IHttpHandler, HttpHandler>();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+builder.Logging.AddAzureWebAppDiagnostics().Services.Configure<AzureFileLoggerOptions>(options =>
+{
+    options.FileName = "azure-log-front";
+    options.FileSizeLimit = 50 * 1024;
+    options.RetainedFileCountLimit = 10;
+});
 
 
 builder.Services.AddAuthorizationCore();

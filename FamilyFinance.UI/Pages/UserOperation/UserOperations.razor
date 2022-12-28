@@ -130,7 +130,7 @@ else
 
     int id = 1;
     private int itemsPerPage = 10;
-    private int totalPages = 1;
+    private int totalPages;
     private int pageIndex = 1;
 
     private int totalPageQuantity;
@@ -147,7 +147,8 @@ else
 
         if (ListUO != null)
         {
-            totalPages = (int)(ListUO.Count() / itemsPerPage);
+            decimal temp = Math.Ceiling((decimal)ListUO.Count / itemsPerPage);
+            totalPages = (int)temp;
 
             var skipCount = itemsPerPage * (pageIndex - 1);
             uoModel = ListUO.Skip(skipCount).Take(itemsPerPage).ToList();
